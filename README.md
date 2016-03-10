@@ -12,7 +12,7 @@ Technologies:
 - Babel (ES6 transpiler)
 - jsHint (code quality tool)
 - Jade (template engine)
-- Stylus (css engine)
+- SASS (css preprocessor)
 - Autoprefixer (css prefixes)
 - Imagemin (images optimisation)
 - Spritesmith (sprites)
@@ -31,7 +31,7 @@ npm -v
 Install global modules:
 
 ```bash
-npm install -g gulp browserify babel jade stylus http-server
+npm install -g gulp browserify babel jade gulp-sass http-server
 ```
 
 Fork this repo:

@@ -1,0 +1,233 @@
+/* Position utility.
+ *
+ * Synopsis:
+ *  fixed: [n] | <pos> [n]
+ *
+ * Examples:
+ *
+ *    @include pos(0 0 0 0) {
+ *      top: 0;
+ *      right: 0;
+ *      bottom: 0;
+ *      left: 0;
+ *    }
+ *
+ *    @include fixed(5px 0px) {
+ *      position: fixed;
+ *      top: 5px;
+ *      right: 0px;
+ *    }
+ *
+ *    @include fixed(bottom 5px) {
+ *      position: fixed;
+ *      bottom: 5px;
+ *    }
+ *
+ *    @include absolute(top 10px bottom 5px) {
+ *      position: absolute;
+ *      top: 10px;
+ *      bottom: 5px;
+ *    }
+ */
+
+@mixin -pos($args, $type: false) {
+
+  $sides: 'top', 'right', 'bottom', 'left';
+  $allprops: true;
+
+  @if $type == 'padding' or $type == 'margin' {
+    @if length($args) == 1 {
+      @each $arg in $args {
+        #{$type} {
+          @extend $arg;
+        }
+      }
+    }
+    @else if length($args) == 2 {
+      @each $arg in $args {
+        $i: nth($args, $arg);
+        @if nth($args, $i) != '0' {
+          #{$type}-#{nth($sides, 0 + $i)} {
+            @extend $arg;
+          }
+          #{$type}-#{nth($sides, 2 + $i)} {
+            @extend $arg;
+          }
+        }
+      }
+    }
+    @else {
+      @each $arg in $args {
+        $i: nth($args, $arg);
+        @if nth($args, $i) != '0' {
+          #{$type}-#{nth($sides, $i)} {
+            @extend $arg;
+          }
+        }
+      } 
+    }
+  }
+  @else {
+    @each $arg in $args {
+      $i: nth($args, $arg);
+      @if $arg == 'top' or $arg == 'right' or $arg == 'bottom' or $arg == 'left' {
+        #{nth($args, $i)} {
+          @extend nth($args, $i+1);
+        }
+        $allprops: false;
+      }
+      @else {
+        @if ($allprops) {
+          #{nth($sides, $i)} {
+            @extend $arg;
+          }
+        }
+      }
+    }
+  }
+}
+
+@mixin pos() {
+  @include -pos(arguments);
+}
+
+@mixin fixed() {
+  position: fixed;
+  @include -pos(arguments);
+}
+
+@mixin absolute() {
+  position: absolute;
+  @include -pos(arguments);
+}
+
+@mixin relative() {
+  position: relative;
+  @include -pos(arguments);
+}
+
+
+
+/* Size utility.
+ *
+ * Synopsis:
+ *  size: <width> <height> | <width & height>
+ *
+ * Examples:
+ *
+ *    @include size(100% 30px) {
+ *      width: 100%;
+ *      height: 30px;
+ *    }
+ *    @include size(5px) {
+ *      width: 5px;
+ *      height: 5px;
+ *    }
+ */
+
+@mixin size() {
+  @if length(arguments) == 1 {
+    width: nth(arguments, 0);
+    height: nth(arguments, 0);
+  }
+  @else {
+    width: nth(arguments, 0);
+    height: nth(arguments, 1);
+  }
+}
+
+
+
+/*
+ * Border triangles utility.
+ *
+ * Synopsis:
+ *   css-triangle: <size> <color> <direction>
+ *
+ * Examples:
+ *
+ *    @include css-triangle(5px #000 top) {
+ *      content: '';
+ *      display: block;
+ *      width: 0;
+ *      height: 0;
+ *      border: inset 5px;
+ *      border-color: transparent transparent #000 transparent;
+ *      border-bottom-style: solid;
+ *    }
+ */
+
+@mixin css-triangle($triangle-size, $triangle-color, $triangle-direction) {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border: inset $triangle-size;
+  @if ($triangle-direction == top) {
+    border-color: transparent transparent $triangle-color transparent;
+    border-bottom-style: solid;
+  }
+  @if ($triangle-direction == right) {
+    border-color: transparent transparent transparent $triangle-color;
+    border-left-style: solid;
+  }
+  @if ($triangle-direction == bottom) {
+    border-color: $triangle-color transparent transparent transparent;
+    border-top-style: solid;
+  }
+  @if ($triangle-direction == left) {
+    border-color: transparent $triangle-color transparent transparent;
+    border-right-style: solid;
+  }
+}
+
+
+
+
+/*
+ * Hide text
+ *
+ */
+
+@mixin hide-text() {
+  text-indent: 200%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+
+
+
+/*
+ * Font connect
+ *
+ */
+
+@mixin font-connect($family, $src) {
+  font-family: $family;
+  src: url($src + ".eot");
+  src: url($src + ".eot?#iefix") format("embedded-opentype"), //url($src + ".woff2") format("woff2"),
+    url($src + ".woff") format("woff"),
+    url($src + ".ttf") format("truetype"),
+    url($src + ".svg?#" + family) format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+/*
+ * Font rendering OS X
+ *
+ */
+  
+@mixin font-smoothing($active: true) {
+  @if $active == true {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  @else {
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+  }
+}
